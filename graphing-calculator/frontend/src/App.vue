@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <h1>Graphing Calculator</h1>
+    <h1 class ="title">Graphx</h1>
     <GraphCalculator />
   </div>
 </template>
@@ -15,3 +15,11 @@ export default {
   }
 }
 </script>
+
+<style>
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>

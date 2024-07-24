@@ -1,56 +1,56 @@
 <template>
   <div class="graph-calculator">
-    <input v-model="equation" placeholder="Enter equation (e.g., x^2)">
-    <button @click="plotGraph">Plot</button>
-    <Line v-if="chartData" :chart-data="chartData" :chart-options="chartOptions" />
+    <div id="calculator" style="width: 900px; height: 600px;"></div>
   </div>
 </template>
 
 <script>
-import { Line } from 'vue-chartjs'
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
-import { calculatePoints } from '@/services/calculatorService'
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
-
 export default {
   name: 'GraphCalculator',
-  components: { Line },
   data() {
     return {
       equation: '',
-      chartData: null,
-      chartOptions: {
-        responsive: true,
-        scales: {
-          x: {
-            type: 'linear',
-            position: 'center',
-          },
-          y: {
-            type: 'linear',
-            position: 'center',
-          }
-        }
-      }
-    }
+      calculator: null
+    };
+  },
+  mounted() {
+    // Dynamically load the Desmos script
+    const script = document.createElement('script');
+    script.src = 'https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6';
+    script.onload = () => {
+      this.initializeCalculator();
+    };
+    document.head.appendChild(script);
   },
   methods: {
-    async plotGraph() {
-      try {
-        const points = await calculatePoints(this.equation)
-        this.chartData = {
-          datasets: [{
-            label: this.equation,
-            data: points,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-          }]
-        }
-      } catch (error) {
-        console.error('Error plotting graph:', error)
+    initializeCalculator() {
+      const elt = document.getElementById('calculator');
+      this.calculator = Desmos.GraphingCalculator(elt);
+    },
+    plotGraph() {
+      if (this.calculator) {
+        this.calculator.setExpression({ id: 'graph', latex: this.equation });
       }
     }
   }
-}
+};
 </script>
+
+<style>
+.graph-calculator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+input {
+  margin-bottom: 10px;
+  padding: 8px;
+  font-size: 16px;
+}
+button {
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+</style>
